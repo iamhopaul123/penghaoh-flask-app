@@ -11,7 +11,7 @@ image:
   # Path to your application's Dockerfile.
   build: .
   # Port exposed through your container to route traffic to it.
-  port: 80
+  port: 5000
 
 http:
   # Requests to this path will be forwarded to your service.
