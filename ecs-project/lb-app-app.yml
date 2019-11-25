@@ -1,9 +1,9 @@
-# The manifest for the "my-app" application.
+# The manifest for the "lb-app" application.
 # Read the full specification for the "Load Balanced Web App" type at:
 #   https://github.com/aws/amazon-ecs-cli-v2/docs/manifests/load-balanced-web-app.
 
 # Your application name will be used in naming your resources like log groups, services, etc.
-name: my-app
+name: lb-app
 # The "architecture" of the application you're running.
 type: Load Balanced Web App
 

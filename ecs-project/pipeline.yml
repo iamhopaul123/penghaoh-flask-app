@@ -25,4 +25,6 @@ stages:
       # The name of the environment to deploy to.
       name: test
     -
+      # The name of the environment to deploy to.
       name: test-env
+
