@@ -1,9 +1,9 @@
-# The manifest for the "lb-app" application.
+# The manifest for the "my-app" application.
 # Read the full specification for the "Load Balanced Web App" type at:
 #   https://github.com/aws/amazon-ecs-cli-v2/docs/manifests/load-balanced-web-app.
 
 # Your application name will be used in naming your resources like log groups, services, etc.
-name: lb-app
+name: my-app
 # The "architecture" of the application you're running.
 type: Load Balanced Web App
 
@@ -11,7 +11,7 @@ image:
   # Path to your application's Dockerfile.
   build: .
   # Port exposed through your container to route traffic to it.
-  port: 80
+  port: 5000
 
 http:
   # Requests to this path will be forwarded to your service.
