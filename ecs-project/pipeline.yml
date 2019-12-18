@@ -1,7 +1,7 @@
 # This YAML file defines the relationship and deployment ordering of your environments.
 
 # The name of the pipeline
-name: pipeline-my-project-penghaoh-flask-app
+name: pipeline-my-project-iamhopaul123-penghaoh-flask-app
 
 # The version of the schema used in this template
 version: 1
@@ -21,7 +21,5 @@ source:
 # The deployment section defines the order the pipeline will deploy
 # to your environments.
 stages:
-    -
-      # The name of the environment to deploy to.
+    - # The name of the environment to deploy to.
       name: test
-
