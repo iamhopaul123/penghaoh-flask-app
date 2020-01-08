@@ -22,4 +22,4 @@ source:
 # to your environments.
 stages:
     - # The name of the environment to deploy to.
-      name: test
+      name: prod

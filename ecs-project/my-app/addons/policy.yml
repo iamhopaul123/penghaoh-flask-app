@@ -1,0 +1,11 @@
+AdditionalResourcesPolicy:
+  Type: AWS::IAM::ManagedPolicy
+  Properties:
+    PolicyName: AdditionalResourcesPolicy
+    PolicyDocument:
+      Version: 2012-10-17
+      Statement:
+      - Effect: Allow
+        Action:
+        - "dynamodb:BatchGet*"
+        Resource: "arn:aws:dynamodb:*:*:table/{{tableName}}"

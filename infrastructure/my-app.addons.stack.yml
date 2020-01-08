@@ -1,0 +1,45 @@
+# Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+AWSTemplateFormatVersion: 2010-09-09
+Description: Additional resources for application 'my-app'
+Parameters:
+  Project:
+    Type: String
+    Description: The project name.
+  Env:
+    Type: String
+    Description: The environment name your application is being deployed to.
+  App:
+    Type: String
+    Description: The name of the application being deployed.
+
+Resources:
+  KudosDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: !Sub "${Project}-${Env}-${App}-kudos"
+      AttributeDefinitions: 
+        - AttributeName: id
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  AdditionalResourcesPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyName: AdditionalResourcesPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+          - "dynamodb:BatchGet*"
+          Resource: "arn:aws:dynamodb:*:*:table/{{tableName}}"
+
+Outputs:
+  AdditionalResourcesPolicyArn:
+    Description: ARN of the policy to access additional resources from the application.
+    Value: !Ref AdditionalResourcesPolicy

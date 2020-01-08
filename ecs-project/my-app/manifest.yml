@@ -15,7 +15,7 @@ image:
 
 http:
   # Requests to this path will be forwarded to your service.
-  path: '*'
+  path: 'my-app'
 
 # Number of CPU units for the task.
 cpu: 256

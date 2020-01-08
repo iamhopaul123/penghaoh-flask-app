@@ -1,16 +1,16 @@
 
-<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/my-app/static/style.css">
 
 <h1> Welcome to my notice board! </h1>
 
-<p><a href="/add">Add a message</a></p>
+<p><a href="/my-app/add">Add a message</a></p>
 
 {% for e in entries %}
     <div class="entry">
         <p class="entrytext"> {{e['text']}} </p>
         <p class="metadata"> by {{e['author']}} on {{e['timestamp']}} </p>
         <p class="metadata"> id: {{e['id']}} </p>
-        <form action="/delete" method="POST">
+        <form action="/my-app/delete" method="POST">
 	    	<p><input type="hidden" name="id" value="{{e['id']}}"></p>
 	    	<p><input type="submit" value="X"></p>
     	</form>
