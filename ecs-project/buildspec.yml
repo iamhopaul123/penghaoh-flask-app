@@ -9,8 +9,8 @@ phases:
       - echo "cd into $CODEBUILD_SRC_DIR"
       - cd $CODEBUILD_SRC_DIR
       # Download the ecs-cli-v2 linux binary.
-      - wget https://ecs-cli-v2-release.s3.amazonaws.com/ecs-preview-linux-v0.0.5
-      - mv ./ecs-preview-linux-v0.0.5 ./ecs-preview
+      - wget https://penghaoh-archer.s3-us-west-2.amazonaws.com/ecs-preview-amd64
+      - mv ./ecs-preview-amd64 ./ecs-preview
       - chmod +x ./ecs-preview
   build:
     commands:
@@ -20,10 +20,9 @@ phases:
     commands:
       - ls -l
       - export COLOR="false"
-      # Find all the local applications in the workspace
-      - manifests=$(find ./ecs-project -name '*-app.yml')
-      # Remove forward slashes and the trailing -app.yml to get the names
-      - apps=$(find ./ecs-project -name '*-app.yml' | sed -e 's!.*/!!' -e 's/-app.yml//')
+      # Find all the local applications in the workspace.
+      - apps=$(./ecs-preview app ls --local --json | jq '.applications[].name' | sed 's/"//g')
+      # Find all the environments.
       - envs=$(./ecs-preview env ls --json | jq '.environments[].name' | sed 's/"//g')
       # Generate the cloudformation templates.
       # The tag is the build ID but we replaced the colon ':' with a dash '-'.
@@ -35,6 +34,31 @@ phases:
           done;
         done;
       - ls -lah ./infrastructure
+      # If addons exists, upload addons templates to each S3 bucket and write template URL to template config files.
+      - |
+        ADDONSFILE=./infrastructure/$app.addons.stack.yml
+        if [ -f "$ADDONSFILE" ]; then
+          echo "Copying addons stack templates to S3"
+          for app in $apps; do
+            timestamp=$(date +%s)
+            for row in $(echo '[{"BucketName":"stackset-my-project-infr-pipelinebuiltartifactbuc-k0jp3eeye7b8","Region":"us-west-2","Environments":"prod,test"}]' | jq -r '.[] | @base64'); do
+              _jq() {
+                echo ${row} | base64 --decode | jq -r ${1}
+              }
+              bucketName=$(_jq '.BucketName')
+              region=$(_jq '.Region')
+              envsTemp=$(_jq '.Environments')
+              IFS=',' read -ra environments <<< "$envsTemp"
+              
+              aws s3 cp "$ADDONSFILE" "s3://$bucketName/manual/$timestamp/$app.addons.stack.yml";
+
+              for envName in "${environments[@]}"; do
+                tmp=$(mktemp)
+                jq --arg a "https://$bucketName.s3-$region.amazonaws.com/manual/$timestamp/$app.addons.stack.yml" '.Parameters.AddonsTemplateURL = $a' ./infrastructure/$app-$envName.params.json > "$tmp" && mv "$tmp" ./infrastructure/$app-$envName.params.json
+              done;
+            done;
+          done;
+        fi
       # Build images
       # - For each manifest file:
       #   - Read the path to the Dockerfile by translating the YAML file into JSON
@@ -44,7 +68,7 @@ phases:
       #     - Login and push the image.
       - >
         for app in $apps; do
-          for docker_dir in $(cat $CODEBUILD_SRC_DIR/ecs-project/$app-app.yml | ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' | jq '.image.build' | sed 's/"//g'); do
+          for docker_dir in $(cat $CODEBUILD_SRC_DIR/ecs-project/$app/manifest.yml | ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' | jq '.image.build' | sed 's/"//g'); do
           cd $CODEBUILD_SRC_DIR/$docker_dir;
           docker build -t $app:$tag .;
           image_id=$(docker images -q $app:$tag);

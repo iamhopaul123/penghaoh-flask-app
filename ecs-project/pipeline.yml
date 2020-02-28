@@ -23,3 +23,5 @@ source:
 stages:
     - # The name of the environment to deploy to.
       name: prod
+    - # The name of the environment to deploy to.
+      name: test

@@ -1,7 +1,6 @@
 AdditionalResourcesPolicy:
   Type: AWS::IAM::ManagedPolicy
   Properties:
-    PolicyName: AdditionalResourcesPolicy
     PolicyDocument:
       Version: 2012-10-17
       Statement:
